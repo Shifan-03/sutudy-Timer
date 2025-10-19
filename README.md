@@ -38,24 +38,21 @@
             transform: translateY(-3px);
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
         }
-        /* --- REPORT CARD GLOW EFFECT START --- */
         .report-card {
             backdrop-filter: blur(5px);
             -webkit-backdrop-filter: blur(5px);
             border: 1px solid rgba(255, 255, 255, 0.1); 
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease-in-out; /* Changed to 'all' for better transition */
+            transition: all 0.3s ease-in-out; 
             color: #ffffff;
             position: relative;
         }
         .report-card:hover {
-            transform: translateY(-8px) scale(1.02); /* More lift and slight expansion */
-            /* Stronger, diffused blue shadow to simulate glow */
-            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4), /* Primary Blue glow */
-                        0 0 15px rgba(255, 255, 255, 0.1); /* White highlight */
-            border-color: rgba(59, 130, 246, 0.5); /* Highlight border */
+            transform: translateY(-8px) scale(1.02); 
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4), 
+                        0 0 15px rgba(255, 255, 255, 0.1); 
+            border-color: rgba(59, 130, 246, 0.5); 
         }
-        /* --- REPORT CARD GLOW EFFECT END --- */
         .modal-content {
             background-color: rgba(30, 41, 59, 0.95); 
             backdrop-filter: blur(8px);
@@ -66,8 +63,6 @@
         .modal-content .text-gray-900 {
             color: #f7fafc;
         }
-
-        /* --- NEW: Shutter/Flip Animation CSS for Digits --- */
         @keyframes flip-in {
             0% { transform: perspective(400px) rotateX(-90deg); opacity: 0; }
             50% { transform: perspective(400px) rotateX(0deg); opacity: 1; }
@@ -77,7 +72,6 @@
             animation: flip-in 0.4s ease-out; 
             display: inline-block;
         }
-
         /* --- Custom Gradients for Reports --- */
         .grad-total { background: linear-gradient(135deg, #1f2937 0%, #4b5563 100%); }
         .grad-1 { background: linear-gradient(135deg, #FFA000 0%, #CC8000 100%); }
@@ -98,7 +92,6 @@
                 font-size: 0.875rem;
             }
             .timer-segment {
-                /* Increased size for better mobile display, matching the larger desktop size */
                 min-width: 100px; 
                 padding: 0.5rem 0.25rem;
             }
@@ -117,22 +110,16 @@
 
         <h1 class="text-3xl font-bold text-center text-white mb-2">স্টাডি ট্র্যাকার</h1>
         
-        <!-- NEW: Motivation Message Display -->
+        <!-- Motivation Message Display -->
         <p id="motivationMessage" class="text-center text-amber-300 font-semibold mb-8 h-6">
             পড়ার সেশন শুরু হলে এখানে অনুপ্রেরণা দেখতে পাবেন।
         </p>
 
-        <!-- Loading Indicator for Firebase --><div id="loading" class="text-center text-lg text-gray-400 mb-4">
-            <p>ডেটাবেস লোড হচ্ছে... অনুগ্রহ করে অপেক্ষা করুন।</p>
-        </div>
-
-        <!-- --- NAVIGATION TABS --- -->
-        <div id="appTabs" class="hidden flex justify-center mb-8 border-b-2 border-gray-700">
-            <!-- Timer Tab: Default Indigo style -->
+        <!-- --- NAVIGATION TABS (Now visible by default) --- -->
+        <div id="appTabs" class="flex justify-center mb-8 border-b-2 border-gray-700">
             <button id="timerTab" data-view="timer" class="p-3 px-6 text-lg font-semibold transition duration-200">
                 ⏱️ টাইমার
             </button>
-            <!-- Report Tab: Unique Amber style -->
             <button id="reportTab" data-view="report" class="p-3 px-6 text-lg font-semibold transition duration-200">
                 📊 রিপোর্ট
             </button>
@@ -140,8 +127,8 @@
         <!-- --- END NAVIGATION TABS --- -->
 
 
-        <!-- --- 1. TIMER VIEW (Default) --- -->
-        <div id="timerView" class="hidden">
+        <!-- --- 1. TIMER VIEW (Now visible by default) --- -->
+        <div id="timerView">
             
             <!-- Course Selector --><div class="mb-8 flex flex-col items-center">
                 <label for="courseSelect" class="text-xl font-semibold text-gray-200 mb-3">
@@ -156,7 +143,7 @@
             <div class="text-center mb-10">
                 <div class="flex justify-center items-center space-x-2 md:space-x-4 select-none">
                     
-                    <!-- Hour Segment: Increased font size and min-width -->
+                    <!-- Hour Segment -->
                     <div class="timer-segment bg-indigo-700 p-3 md:p-4 rounded-xl shadow-2xl min-w-[110px] md:min-w-[150px]">
                         <span id="timerHours" class="timer-display text-6xl md:text-8xl">00</span>
                         <p class="text-xs md:text-sm text-gray-300 font-medium mt-1">ঘন্টা</p>
@@ -164,7 +151,7 @@
                     <!-- Separator -->
                     <span class="timer-separator text-5xl md:text-8xl font-thin text-gray-400">:</span>
                     
-                    <!-- Minute Segment: Increased font size and min-width -->
+                    <!-- Minute Segment -->
                     <div class="timer-segment bg-gray-700 p-3 md:p-4 rounded-xl shadow-2xl min-w-[110px] md:min-w-[150px]">
                         <span id="timerMinutes" class="timer-display text-6xl md:text-8xl">00</span>
                         <p class="text-xs md:text-sm text-gray-300 font-medium mt-1">মিনিট</p>
@@ -172,7 +159,7 @@
                     <!-- Separator -->
                     <span class="timer-separator text-5xl md:text-8xl font-thin text-gray-400">:</span>
 
-                    <!-- Second Segment: Increased font size and min-width -->
+                    <!-- Second Segment -->
                     <div class="timer-segment bg-gray-700 p-3 md:p-4 rounded-xl shadow-2xl min-w-[110px] md:min-w-[150px]">
                         <span id="timerSeconds" class="timer-display text-6xl md:text-8xl">00</span>
                         <p class="text-xs md:text-sm text-gray-300 font-medium mt-1">সেকেন্ড</p>
@@ -237,13 +224,14 @@
         // Global variables provided by the environment (MUST be used)
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        // FIX: Changed 'initialAuthToken' to '__initial_auth_token' to access the correct global variable.
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null; 
 
         // --- Core Variables ---
         let app, db, auth;
         let userId = null;
         let timerInterval = null;
-        let motivationInterval = null; // NEW: Motivation interval
+        let motivationInterval = null; 
         let startTime = 0;
         let elapsedTime = 0;
         let isRunning = false;
@@ -283,9 +271,8 @@
         const pauseButton = document.getElementById('pauseButton');
         const resetButton = document.getElementById('resetButton');
         const statusMessage = document.getElementById('statusMessage');
-        const motivationMessage = document.getElementById('motivationMessage'); // NEW: Motivation message element
+        const motivationMessage = document.getElementById('motivationMessage'); 
         const reportContainer = document.getElementById('reportContainer');
-        const loadingDiv = document.getElementById('loading');
         const appTabsDiv = document.getElementById('appTabs'); 
         const userIdDisplay = document.getElementById('userIdDisplay');
         const liveClockDisplay = document.getElementById('liveClock'); 
@@ -485,7 +472,7 @@
 
                 startButton.textContent = "পড়া চলছে...";
 
-                // NEW: Start motivation message rotation
+                // Start motivation message rotation
                 displayMotivation(); // Display first message immediately
                 if (motivationInterval) clearInterval(motivationInterval);
                 motivationInterval = setInterval(displayMotivation, 60000); // Update every 1 minute (60000ms)
@@ -498,7 +485,7 @@
                 clearInterval(timerInterval);
                 isRunning = false;
                 
-                clearMotivation(); // NEW: Clear motivation interval
+                clearMotivation(); // Clear motivation interval
 
                 const selectedCourse = courseSelect.value;
                 const durationMs = elapsedTime;
@@ -534,7 +521,7 @@
                 clearInterval(timerInterval);
                 isRunning = false;
             }
-            clearMotivation(); // NEW: Clear motivation interval
+            clearMotivation(); // Clear motivation interval
 
             elapsedTime = 0;
             if(timerHours && timerMinutes && timerSeconds) {
@@ -683,11 +670,8 @@
                 populateCourseSelector();
                 setupEventListeners();
                 setupReportListener(); 
-
-                loadingDiv.classList.add('hidden');
-                appTabsDiv.classList.remove('hidden');
                 
-                // Set initial view to Timer
+                // Set initial view to Timer (This now only sets the active tab styles)
                 switchView('timer'); 
                 updateControlButtons();
                 
@@ -698,7 +682,10 @@
 
             } catch (error) {
                 console.error("Firebase initialization failed:", error);
-                loadingDiv.textContent = `Firebase লোড করতে সমস্যা হয়েছে: ${error.message}`;
+                // Since the loading div is removed, we'll use the status message for errors
+                statusMessage.textContent = `Firebase লোড করতে সমস্যা হয়েছে: ${error.message}`;
+                statusMessage.classList.remove('text-green-400', 'text-gray-400');
+                statusMessage.classList.add('text-red-400');
             }
         };
 
@@ -749,3 +736,23 @@
     </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
