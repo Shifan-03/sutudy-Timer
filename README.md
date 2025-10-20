@@ -1,23 +1,24 @@
 # sutudy-Timer
-<!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>কোর্স ফোকাস টাইমার</title>
-    <!-- Tailwind CSS CDN --><script src="https://cdn.tailwindcss.com"></script>
-    <!-- Inter Font --><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN --><script src="https://cdn.tailwindcss.com/3.4.1"></script>
+    <!-- Inter Font --><link href="https://fonts.googleapis.com/css2?family=Inter:wght400;600;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-color: #3b82f6; /* Blue 500 */
         }
         body {
+            /* Background Gradient: Dark Blue/Gray */
             background: linear-gradient(135deg, #2b3a4a 0%, #1a202c 100%); 
             background-attachment: fixed;
             color: #e2e8f0; 
             font-family: 'Inter', sans-serif;
         }
         .glass-container {
+            /* Glassmorphism Effect */
             background-color: rgba(255, 255, 255, 0.1); 
             backdrop-filter: blur(15px); 
             -webkit-backdrop-filter: blur(15px);
@@ -39,31 +40,15 @@
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
         }
         .report-card {
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease-in-out; 
-            color: #ffffff;
-            position: relative;
+            /* Deep Background set in JS (bg-gray-900) */
+            transition: transform 0.3s ease;
         }
         .report-card:hover {
-            transform: translateY(-8px) scale(1.02); 
-            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4), 
-                        0 0 15px rgba(255, 255, 255, 0.1); 
-            border-color: rgba(59, 130, 246, 0.5); 
-        }
-        .modal-content {
-            background-color: rgba(30, 41, 59, 0.95); 
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #e2e8f0;
-        }
-        .modal-content .text-gray-900 {
-            color: #f7fafc;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.5); /* Stronger hover shadow */
         }
         @keyframes flip-in {
+            /* Animation for timer segments */
             0% { transform: perspective(400px) rotateX(-90deg); opacity: 0; }
             50% { transform: perspective(400px) rotateX(0deg); opacity: 1; }
             100% { transform: perspective(400px) rotateX(0deg); opacity: 1; }
@@ -72,16 +57,6 @@
             animation: flip-in 0.4s ease-out; 
             display: inline-block;
         }
-        /* --- Custom Gradients for Reports --- */
-        .grad-total { background: linear-gradient(135deg, #1f2937 0%, #4b5563 100%); }
-        .grad-1 { background: linear-gradient(135deg, #FFA000 0%, #CC8000 100%); }
-        .grad-2 { background: linear-gradient(135deg, #101235 0%, #000223 100%); }
-        .grad-3 { background: linear-gradient(135deg, #996633 0%, #7C521B 100%); }
-        .grad-4 { background: linear-gradient(135deg, #5D8055 0%, #76A66A 100%); }
-        .grad-5 { background: linear-gradient(135deg, #A8B530 0%, #C4CD5C 100%); }
-        .grad-6 { background: linear-gradient(135deg, #B30015 0%, #E6001B 100%); }
-        .grad-7 { background: linear-gradient(135deg, #005A7A 0%, #007AAD 100%); }
-        .grad-8 { background: linear-gradient(135deg, #5C6A78 0%, #7D8893 100%); }
 
         /* Responsive Adjustments */
         @media (max-width: 640px) {
@@ -105,29 +80,17 @@
         লোডিং...
     </div>
 
-    <!-- Main Container: Changed max-w-4xl to max-w-2xl -->
+    <!-- Main Container: max-w-2xl for better mobile and desktop view -->
     <div class="w-full max-w-2xl glass-container rounded-xl p-6 md:p-10">
 
-        <h1 class="text-3xl font-bold text-center text-white mb-2">স্টাডি ট্র্যাকার</h1>
+        <h1 class="text-3xl font-bold text-center text-white mb-2">স্টাডি ট্র্যাকার ও টাইমার</h1>
         
         <!-- Motivation Message Display -->
-        <p id="motivationMessage" class="text-center text-amber-300 font-semibold mb-8 h-6">
-            পড়ার সেশন শুরু হলে এখানে অনুপ্রেরণা দেখতে পাবেন।
+        <p id="motivationMessage" class="text-center text-amber-300 font-semibold mb-6 h-6">
+            ডেটা লোড হচ্ছে...
         </p>
-
-        <!-- --- NAVIGATION TABS --- -->
-        <div id="appTabs" class="flex justify-center mb-8 border-b-2 border-gray-700">
-            <button id="timerTab" data-view="timer" class="p-3 px-6 text-lg font-semibold transition duration-200">
-                ⏱️ টাইমার
-            </button>
-            <button id="reportTab" data-view="report" class="p-3 px-6 text-lg font-semibold transition duration-200">
-                📊 রিপোর্ট
-            </button>
-        </div>
-        <!-- --- END NAVIGATION TABS --- -->
-
-
-        <!-- --- 1. TIMER VIEW --- -->
+        
+        <!-- --- TIMER VIEW (The only view, now includes the report) --- -->
         <div id="timerView">
             
             <!-- Course Selector --><div class="mb-8 flex flex-col items-center">
@@ -165,7 +128,7 @@
                         <p class="text-xs md:text-sm text-gray-300 font-medium mt-1">সেকেন্ড</p>
                     </div>
                 </div>
-                <p id="statusMessage" class="text-red-400 font-semibold mt-4 h-6"></p>
+                <!-- Status Message Area --><p id="statusMessage" class="text-red-400 font-semibold mt-4 h-6"></p>
             </div>
             <!-- End of Segmented Timer Display -->
 
@@ -180,79 +143,111 @@
                     🔄 রিসেট
                 </button>
             </div>
+            
+            <!-- --- REPORT SECTION (Integrated) --- -->
+            <div id="reportSection" class="pt-2 border-t border-gray-700 mt-8">
+                <div class="bg-indigo-900 text-white p-3 rounded-lg mb-4">
+                    <p class="text-sm font-semibold">✅ এই অ্যাপটি ফায়ারবেস ব্যবহার করে আপনার অধ্যয়নের সময় পার্মানেন্টলি সেভ করছে।</p>
+                </div>
+                <h2 class="text-2xl font-bold text-white mb-6 text-center">মোট অধ্যয়নের রিপোর্ট (লাইফটাইম)</h2>
+                <div id="reportContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Reports will be inserted here by JavaScript -->
+                    <div class="text-center text-gray-400 col-span-full">ফায়ারবেস থেকে ডেটা লোড হচ্ছে...</div>
+                </div>
+            </div>
+            <!-- --- END REPORT SECTION --- -->
+
+            <!-- --- DATA MANAGEMENT SECTION --- -->
+            <div id="dataManagementSection" class="pt-6 border-t border-gray-700 mt-8">
+                <h2 class="text-xl font-bold text-white mb-4 text-center">ডেটা ম্যানেজমেন্ট</h2>
+                <div class="flex flex-col items-center space-y-4">
+                    <select id="courseResetSelect" class="w-full max-w-sm p-3 border-2 border-gray-600 rounded-lg text-lg font-medium shadow-sm bg-gray-800 text-white bg-opacity-80 focus:border-red-400 focus:ring focus:ring-red-500 focus:ring-opacity-50 transition duration-150 ease-in-out">
+                        <option value="" disabled selected>--- যে কোর্সের ডেটা মুছবেন ---</option>
+                    </select>
+                    <button id="deleteDataButton" class="btn-primary bg-red-700 hover:bg-red-800 text-white font-bold py-3 px-6 rounded-lg shadow-md transition duration-200 w-full max-w-sm" disabled>
+                        🗑️ নির্বাচিত কোর্সের সম্পূর্ণ ডেটা মুছুন
+                    </button>
+                </div>
+            </div>
+            <!-- --- END DATA MANAGEMENT SECTION --- -->
         </div>
         <!-- --- END TIMER VIEW --- -->
-
-
-        <!-- --- 2. REPORT VIEW (Initially Hidden) --- -->
-        <!-- Added pt-2 only, removed mt-8 as the main container handles margin. Ensure 'hidden' is the default state -->
-        <div id="reportView" class="hidden pt-2">
-            <h2 class="text-2xl font-bold text-white mb-6 text-center">মোট অধ্যয়নের রিপোর্ট</h2>
-            <div id="reportContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <!-- Reports will be inserted here -->
-                <div class="text-center text-gray-400 col-span-full">রিপোর্ট লোড হচ্ছে...</div>
-            </div>
-        </div>
-        <!-- --- END REPORT VIEW --- -->
             
         <div class="mt-8 text-sm text-gray-400 text-center">
-            ইউজার আইডি: <span id="userIdDisplay" class="font-mono text-xs bg-gray-800 p-1 rounded"></span>
+            ইউজার আইডি: <span id="userIdDisplay" class="font-mono text-xs bg-gray-800 p-1 rounded">লোডিং...</span>
         </div>
     </div>
 
-    <!-- Confirmation Modal for Reset (Hidden by default) --><div id="confirmationModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-sm transform transition-all duration-300 scale-100 modal-content">
-            <h3 class="text-xl font-bold text-gray-900 mb-4">⚠️ নিশ্চিত করুন</h3>
-            <p class="text-gray-700 mb-6">
-                আপনি কি নিশ্চিত যে আপনি কোর্স **<span id="modalCourseName" class="font-bold text-red-400"></span>** এর জন্য সেভ করা সমস্ত ডেটা স্থায়ীভাবে মুছে ফেলতে চান? এই অ্যাকশনটি পূর্বাবস্থায় ফেরানো যাবে না।
-            </p>
+    <!-- Confirmation Modal Structure (Hidden by default) -->
+    <div id="deleteConfirmationModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[100] hidden">
+        <div class="bg-gray-800 p-6 rounded-xl shadow-2xl max-w-sm w-full border border-red-500">
+            <h3 class="text-xl font-bold text-red-400 mb-3">সতর্কতা! ডেটা মুছে ফেলা হচ্ছে</h3>
+            <p class="text-gray-300 mb-4">আপনি কি নিশ্চিত যে আপনি কোর্সের জন্য সমস্ত অধ্যয়নের সময় (লাইফটাইম ডেটা) মুছে ফেলতে চান: <span id="courseToDeleteName" class="font-bold text-white"></span>?</p>
+            <p class="text-sm text-yellow-400 mb-6">এই পদক্ষেপটি আর ফিরিয়ে আনা যাবে না।</p>
             <div class="flex justify-end space-x-3">
-                <button id="cancelResetButton" class="bg-gray-600 hover:bg-gray-500 text-white font-medium py-2 px-4 rounded-lg transition duration-150">
-                    না, বাতিল করুন
-                </button>
-                <button id="confirmResetButton" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-150">
-                    হ্যাঁ, রিসেট করুন
-                </button>
+                <button id="cancelDeleteButton" class="bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg font-semibold transition">বাতিল</button>
+                <button id="confirmDeleteButton" class="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg font-semibold transition">হ্যাঁ, মুছুন</button>
             </div>
         </div>
     </div>
 
-    <!-- Firebase SDKs --><script type="module">
+
+    <!-- Firebase SDK Imports -->
+    <script type="module">
+        // Added required imports for querying and batch deleting
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, addDoc, onSnapshot, collection, query, serverTimestamp, setLogLevel, where, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { 
+            getFirestore, collection, addDoc, onSnapshot, setLogLevel, 
+            query, where, getDocs, writeBatch, doc
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        // --- Global Firebase and Application State Variables ---
+        let db;
+        let auth;
+        let userId = 'loading';
+        const COLLECTION_NAME = 'study_sessions';
 
-        // Global variables provided by the environment (MUST be used)
+        // Global environment variables (MANDATORY USE)
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        // FIX: Using the correct global variable name for custom auth token
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null; 
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-        // --- Core Variables ---
-        let app, db, auth;
-        let userId = null;
+
+        // Core Timer/Data State
         let timerInterval = null;
         let motivationInterval = null; 
         let startTime = 0;
         let elapsedTime = 0;
         let isRunning = false;
-        let courseIdToReset = null; 
         
-        // State for current view
-        let currentView = 'timer'; 
+        // This is now populated by the Firestore listener
+        let studyTotals = {}; 
         
         // Course data
         const courses = [
-            { id: 'IS', name: 'Information Systems (IS)', gradient: 'grad-1' },
-            { id: 'TQM', name: 'Total Quality Management (TQM)', gradient: 'grad-2' },
-            { id: 'PYTHON', name: 'Programming (PYTHON)', gradient: 'grad-3' },
-            { id: 'STAT', name: 'Statistics (STAT)', gradient: 'grad-4' },
-            { id: 'HRM', name: 'Human Resource Management (HRM)', gradient: 'grad-5' },
-            { id: 'SBE', name: 'Small Business Entrepreneurship (SBE)', gradient: 'grad-6' },
-            { id: 'ACCOUNTING', name: 'Accounting (হিসাববিজ্ঞান)', gradient: 'grad-7' },
-            { id: 'MBAPREP', name: 'MBA Preparation (এমবিএ প্রস্তুতি)', gradient: 'grad-8' }
+            { id: 'IS', name: 'Information Systems (IS)' },
+            { id: 'TQM', name: 'Total Quality Management (TQM)' },
+            { id: 'PYTHON', name: 'Programming (PYTHON)' },
+            { id: 'STAT', name: 'Statistics (STAT)' },
+            { id: 'HRM', name: 'Human Resource Management (HRM)' },
+            { id: 'SBE', name: 'Small Business Entrepreneurship (SBE)' },
+            { id: 'ACCOUNTING', name: 'Accounting (হিসাববিজ্ঞান)' },
+            { id: 'MBAPREP', name: 'MBA Preparation (এমবিএ প্রস্তুতি)' }
         ];
-        
+
+        // --- Dynamic Color Palette for Courses (Deep Colors) ---
+        const courseColors = [
+            'blue',     // IS
+            'emerald',  // TQM
+            'rose',     // PYTHON
+            'cyan',     // STAT
+            'violet',   // HRM
+            'orange',   // SBE
+            'teal',     // ACCOUNTING
+            'red'       // MBAPREP
+        ];
+
         // --- Motivation Data ---
         const motivationMessages = [
             "ফোকাসড থাকো, প্রতিটি মিনিট মূল্যবান!",
@@ -273,29 +268,23 @@
         const resetButton = document.getElementById('resetButton');
         const statusMessage = document.getElementById('statusMessage');
         const motivationMessage = document.getElementById('motivationMessage'); 
-        const reportContainer = document.getElementById('reportContainer');
-        const appTabsDiv = document.getElementById('appTabs'); 
-        const userIdDisplay = document.getElementById('userIdDisplay');
         const liveClockDisplay = document.getElementById('liveClock'); 
-
-        // VIEWS
-        const timerView = document.getElementById('timerView'); 
-        const reportView = document.getElementById('reportView'); 
+        const reportContainer = document.getElementById('reportContainer'); 
         
-        // TABS
-        const timerTab = document.getElementById('timerTab'); 
-        const reportTab = document.getElementById('reportTab'); 
-
+        // NEW ELEMENTS for Course Reset
+        const courseResetSelect = document.getElementById('courseResetSelect');
+        const deleteDataButton = document.getElementById('deleteDataButton');
+        const deleteConfirmationModal = document.getElementById('deleteConfirmationModal');
+        const courseToDeleteName = document.getElementById('courseToDeleteName');
+        const cancelDeleteButton = document.getElementById('cancelDeleteButton');
+        const confirmDeleteButton = document.getElementById('confirmDeleteButton');
 
         // TIMER SEGMENTS
         const timerHours = document.getElementById('timerHours');
         const timerMinutes = document.getElementById('timerMinutes');
         const timerSeconds = document.getElementById('timerSeconds');
 
-        // Modal Elements
-        const confirmationModal = document.getElementById('confirmationModal');
-        const confirmResetButton = document.getElementById('confirmResetButton');
-        const cancelResetButton = document.getElementById('cancelResetButton');
+        let courseIdToDelete = null; // State to hold the ID of the course to be deleted
 
 
         // --- Utility Functions ---
@@ -327,84 +316,183 @@
             `;
         };
         
-        // --- View Switching Function ---
-        const switchView = (viewName) => {
-            currentView = viewName;
+        /**
+         * Firestore Path Resolver: artifacts/{appId}/users/{userId}/study_sessions
+         */
+        const getCollectionRef = (dbInstance, uid) => {
+            return collection(dbInstance, `artifacts/${appId}/users/${uid}/${COLLECTION_NAME}`);
+        };
+
+
+        /**
+         * Firestore Listener: Fetches all documents and updates studyTotals in real-time.
+         */
+        const setupFirestoreListener = (dbInstance, uid) => {
+            if (!uid || uid === 'loading') return;
+            const sessionsRef = getCollectionRef(dbInstance, uid);
             
-            // Define common classes to remove from both tabs before setting new state
-            const resetClasses = ['border-indigo-500', 'border-amber-500', 'border-transparent', 'text-white', 'text-gray-400', 'hover:border-gray-500', 'hover:border-amber-400', 'shadow-lg', 'shadow-amber-500/30'];
-
-            // 1. Timer Tab (Indigo)
-            if (viewName === 'timer') {
-                // Ensure correct view visibility
-                timerView.classList.remove('hidden');
-                reportView.classList.add('hidden');
-
-                // Timer Active Style (Indigo border)
-                timerTab.classList.remove(...resetClasses);
-                timerTab.classList.add('border-b-4', 'border-indigo-500', 'text-white');
-
-                // Report Inactive Style (Gray text, subtle Amber hover)
-                reportTab.classList.remove(...resetClasses);
-                reportTab.classList.add('border-b-4', 'border-transparent', 'text-gray-400', 'hover:border-amber-400');
+            onSnapshot(sessionsRef, (snapshot) => {
+                // Reset totals and recalculate from current snapshot
+                studyTotals = {};
                 
-            // 2. Report Tab (Amber) - UNIQUE STYLE
-            } else if (viewName === 'report') {
-                // Ensure correct view visibility
-                timerView.classList.add('hidden');
-                reportView.classList.remove('hidden');
-
-                // Timer Inactive Style (Gray text, subtle Gray hover)
-                timerTab.classList.remove(...resetClasses);
-                timerTab.classList.add('border-b-4', 'border-transparent', 'text-gray-400', 'hover:border-gray-500');
+                snapshot.forEach((doc) => {
+                    const session = doc.data();
+                    const courseId = session.courseId;
+                    const durationMs = session.durationMs;
+                    
+                    if (courseId && typeof durationMs === 'number') {
+                         studyTotals[courseId] = (studyTotals[courseId] || 0) + durationMs;
+                    }
+                });
                 
-                // Report Active Style (Amber border + Glow for uniqueness)
-                reportTab.classList.remove(...resetClasses);
-                reportTab.classList.add('border-b-4', 'border-amber-500', 'text-white', 'shadow-lg', 'shadow-amber-500/30');
+                console.log("Firestore Data Updated. New Totals:", studyTotals);
+                renderReport(); // Re-render the report with updated data
+                motivationMessage.textContent = "পড়ার সেশন শুরু করতে একটি কোর্স নির্বাচন করুন।";
+            }, (error) => {
+                console.error("Error setting up Firestore listener:", error);
+                statusMessage.textContent = "⚠️ ডেটা লোড করতে বা সিঙ্ক করতে সমস্যা হচ্ছে।";
+                statusMessage.classList.add('text-red-400');
+            });
+        };
+
+        /**
+         * Core function to delete all sessions for a specific course using a batch write.
+         * @param {string} courseId The ID of the course whose data should be deleted.
+         */
+        const deleteCourseData = async (courseId) => {
+            if (!db || userId === 'loading' || !courseId) return;
+
+            const sessionsRef = getCollectionRef(db, userId);
+            // Query for all documents belonging to the specific course ID
+            const q = query(sessionsRef, where('courseId', '==', courseId));
+
+            try {
+                const snapshot = await getDocs(q);
+                if (snapshot.empty) {
+                    statusMessage.textContent = `❌ ${courseId}-এর কোনো ডেটা পাওয়া যায়নি।`;
+                    statusMessage.classList.remove('text-green-400', 'text-yellow-400');
+                    statusMessage.classList.add('text-red-400');
+                    return;
+                }
+
+                // Create a batch operation to efficiently delete all found documents
+                const batch = writeBatch(db);
+                snapshot.docs.forEach((d) => {
+                    batch.delete(d.ref);
+                });
+
+                await batch.commit();
+
+                const courseName = courses.find(c => c.id === courseId)?.name || courseId;
+                statusMessage.textContent = `🗑️ সফলভাবে ${courseName}-এর মোট ${snapshot.size} টি সেশন ডেটা মুছে ফেলা হয়েছে!`;
+                statusMessage.classList.remove('text-red-400', 'text-yellow-400');
+                statusMessage.classList.add('text-green-400');
+
+                // Reset the select field after successful deletion
+                courseResetSelect.value = "";
+                deleteDataButton.disabled = true;
+
+            } catch (error) {
+                console.error("Error deleting course data:", error);
+                statusMessage.textContent = `⚠️ ডেটা মোছার সময় ত্রুটি: ${error.message.substring(0, 50)}...`;
+                statusMessage.classList.remove('text-green-400', 'text-yellow-400');
+                statusMessage.classList.add('text-red-400');
             }
         };
 
 
-        // Renders the total study time report
-        const renderReport = (totals) => {
+        // --- Report Rendering Function (Updated for Dynamic Colors) ---
+        const renderReport = () => {
             reportContainer.innerHTML = '';
             
-            const totalStudyTime = courses.reduce((acc, course) => acc + (totals[course.id] || 0), 0);
-            const totalFormatted = formatTime(totalStudyTime);
-            
-            // Total Summary Card
+            // Step 1: Calculate total study time
+            const totalStudyTime = Object.values(studyTotals).reduce((acc, time) => acc + time, 0);
+
+            // Step 2: Show Total Time Card (Deep Indigo/Blue with dramatic shadow)
             const totalCard = document.createElement('div');
-            totalCard.className = "grad-total border-l-4 border-indigo-400 rounded-lg p-4 shadow-sm col-span-full md:col-span-1 lg:col-span-1 report-card";
+            // Keeping the total card highlight consistently blue/indigo for focus
+            totalCard.className = "report-card p-5 rounded-xl shadow-[0_0_20px_rgba(59,130,246,0.3)] bg-indigo-800 col-span-full mb-6";
             totalCard.innerHTML = `
-                <p class="text-sm font-medium text-gray-300">মোট অধ্যয়নের সময়</p>
-                <p class="text-2xl font-bold text-white">${totalFormatted}</p>
+                <p class="text-sm font-medium text-indigo-300">মোট অধ্যয়নের সময়</p>
+                <p class="text-4xl font-extrabold text-white mt-1">${formatTime(totalStudyTime)}</p>
             `;
             reportContainer.appendChild(totalCard);
-            
-            courses.forEach(course => {
-                const totalMs = totals[course.id] || 0;
-                const formattedTime = formatTime(totalMs);
-                const percentage = totalStudyTime > 0 ? ((totalMs / totalStudyTime) * 100).toFixed(1) : 0;
+
+            // Step 3: Render Individual course cards with dynamic colors
+            courses.forEach((course, index) => {
+                const courseId = course.id;
+                const courseName = course.name;
+                const totalMs = studyTotals[courseId] || 0; 
                 
+                const formattedTime = formatTime(totalMs);
+                
+                let percentage = 0;
+                if (totalStudyTime > 0) {
+                    percentage = (totalMs / totalStudyTime) * 100;
+                }
+                
+                const isZeroTime = totalMs === 0;
+
                 const card = document.createElement('div');
-                card.className = `report-card p-4 rounded-lg ${course.gradient}`; 
+                
+                // --- Dynamic Color Application ---
+                const colorBase = courseColors[index % courseColors.length]; // Cycle through colors
+                // Need to use utility classes directly, so we map the color name to the class string
+                // Note: Tailwind classes must be fully present in the source code to be generated
+                const colorMap = {
+                    'blue': 'blue',
+                    'emerald': 'emerald',
+                    'rose': 'rose',
+                    'cyan': 'cyan',
+                    'violet': 'violet',
+                    'orange': 'orange',
+                    'teal': 'teal',
+                    'red': 'red'
+                };
+                const baseColor = colorMap[colorBase];
+                // Tailwind class names are constructed this way:
+                const borderClass = `border-${baseColor}-400`;
+                const progressBgClass = `bg-${baseColor}-400`;
+                const textHighlightClass = `text-${baseColor}-300`;
+
+                // Dummy usage to ensure Tailwind includes classes (important for dynamically generated names)
+                const _tailwindFix = [
+                    'border-blue-400', 'bg-blue-400', 'text-blue-300',
+                    'border-emerald-400', 'bg-emerald-400', 'text-emerald-300',
+                    'border-rose-400', 'bg-rose-400', 'text-rose-300',
+                    'border-cyan-400', 'bg-cyan-400', 'text-cyan-300',
+                    'border-violet-400', 'bg-violet-400', 'text-violet-300',
+                    'border-orange-400', 'bg-orange-400', 'text-orange-300',
+                    'border-teal-400', 'bg-teal-400', 'text-teal-300',
+                    'border-red-400', 'bg-red-400', 'text-red-300',
+                ].join(' '); 
+                
+                let cardClasses;
+                
+                if (isZeroTime) {
+                    // Inactive Card: Deep background, muted border, slightly transparent
+                    cardClasses = "report-card p-4 rounded-xl shadow-lg border-l-4 border-gray-700 bg-gray-900 opacity-70"; 
+                } else {
+                    // Active Card: Deep background, dynamic color highlight, stronger shadow
+                    cardClasses = `report-card p-4 rounded-xl shadow-xl border-l-4 ${borderClass} bg-gray-900`; 
+                }
+
+                card.className = cardClasses; 
                 card.innerHTML = `
-                    <p class="text-base font-semibold text-gray-100">${course.name}</p>
-                    <p class="text-xl font-extrabold text-white mt-1">${formattedTime}</p>
-                    <div class="mt-2 h-2 bg-gray-700 rounded-full">
-                        <div class="h-full bg-indigo-400 rounded-full" style="width: ${percentage}%;"></div> 
+                    <p class="text-base font-semibold ${isZeroTime ? 'text-gray-500' : 'text-white'}">${courseName}</p>
+                    <p class="text-xl font-extrabold ${isZeroTime ? 'text-gray-600' : textHighlightClass} mt-1">
+                        ${formattedTime}
+                    </p>
+                    <div class="mt-3 h-2 bg-gray-700 rounded-full">
+                        <div class="h-full ${progressBgClass} rounded-full transition-all duration-500" style="width: ${percentage.toFixed(1)}%;"></div> 
                     </div>
-                    <div class="flex justify-between items-center mt-3">
-                        <p class="text-xs text-gray-300">${percentage}% মোট সময়ের</p>
-                        <button data-course-id="${course.id}" class="reset-btn text-xs text-red-400 hover:text-red-300 font-medium py-1 px-2 rounded hover:bg-white hover:bg-opacity-10 transition duration-150">
-                            টোটাল রিসেট করুন 🗑️
-                        </button>
-                    </div>
+                    <p class="text-xs ${isZeroTime ? 'text-gray-600' : 'text-gray-400'} mt-2">${percentage.toFixed(1)}% মোট সময়ের</p>
                 `;
+                
                 reportContainer.appendChild(card);
             });
-            reportContainer.className = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4";
         };
+
 
         // --- Motivation Functions ---
         
@@ -418,23 +506,17 @@
                 clearInterval(motivationInterval);
                 motivationInterval = null;
             }
-            motivationMessage.textContent = "পড়ার সেশন শুরু হলে এখানে অনুপ্রেরণা দেখতে পাবেন।";
+            // Message remains permanent prompt
         };
 
 
         // --- Timer Functions ---
         
-        // Helper function to update segment with animation
         const updateSegmentWithAnimation = (element, newValue) => {
             const oldValue = element.textContent;
             if (oldValue !== newValue) {
-                // 1. Apply animation class
                 element.classList.add('shutter-animation');
-                
-                // 2. Update the content immediately after applying the class
                 element.textContent = newValue;
-
-                // 3. Remove animation class after the duration of the animation (400ms)
                 setTimeout(() => {
                     element.classList.remove('shutter-animation');
                 }, 400); 
@@ -447,7 +529,6 @@
                 elapsedTime = Date.now() - startTime;
                 const { hours, minutes, seconds } = getFormattedTimeParts(elapsedTime);
 
-                // Update individual segments using the new animation logic
                 if(timerHours && timerMinutes && timerSeconds) {
                     updateSegmentWithAnimation(timerHours, hours); 
                     updateSegmentWithAnimation(timerMinutes, minutes); 
@@ -456,10 +537,19 @@
             }
         };
 
+
         const startTimer = () => {
             const selectedCourse = courseSelect.value;
             if (!selectedCourse) {
                 statusMessage.textContent = "অনুগ্রহ করে একটি কোর্স নির্বাচন করুন!";
+                statusMessage.classList.remove('text-green-400', 'text-gray-400', 'text-yellow-400');
+                statusMessage.classList.add('text-red-400');
+                return;
+            }
+            if (userId === 'loading') {
+                statusMessage.textContent = "ডেটাবেস সংযোগের জন্য অপেক্ষা করুন...";
+                statusMessage.classList.remove('text-red-400', 'text-green-400');
+                statusMessage.classList.add('text-yellow-400');
                 return;
             }
             statusMessage.textContent = "";
@@ -477,10 +567,9 @@
                 startButton.textContent = "পড়া চলছে...";
 
                 // Start motivation message rotation
-                displayMotivation(); // Display first message immediately
+                displayMotivation(); 
                 if (motivationInterval) clearInterval(motivationInterval);
-                motivationInterval = setInterval(displayMotivation, 60000); // Update every 1 minute (60000ms)
-                
+                motivationInterval = setInterval(displayMotivation, 60000); 
             }
         };
 
@@ -489,21 +578,66 @@
                 clearInterval(timerInterval);
                 isRunning = false;
                 
-                clearMotivation(); // Clear motivation interval
+                clearMotivation(); 
 
                 const selectedCourse = courseSelect.value;
                 const durationMs = elapsedTime;
-
+                
+                // --- FIREBASE DATA SAVE LOGIC ---
                 if (durationMs > 1000) { 
-                    await saveSession(selectedCourse, durationMs);
-                    statusMessage.textContent = `✅ ${selectedCourse}-এর জন্য সময় সেভ করা হলো: ${formatTime(durationMs)}`;
-                    statusMessage.classList.remove('text-red-400', 'text-gray-600');
-                    statusMessage.classList.add('text-green-400');
+                    if (db && userId && userId !== 'loading') {
+                        const sessionsRef = getCollectionRef(db, userId);
+                        try {
+                            // Exponential Backoff implementation (simple version for single attempt)
+                            const MAX_RETRIES = 3;
+                            let retries = 0;
+                            let saved = false;
+
+                            while (retries < MAX_RETRIES && !saved) {
+                                try {
+                                    await addDoc(sessionsRef, {
+                                        courseId: selectedCourse,
+                                        durationMs: durationMs,
+                                        timestamp: new Date().toISOString(),
+                                        userId: userId,
+                                    });
+                                    saved = true;
+                                    break;
+                                } catch (e) {
+                                    retries++;
+                                    if (retries < MAX_RETRIES) {
+                                        const delay = Math.pow(2, retries) * 1000;
+                                        await new Promise(resolve => setTimeout(resolve, delay));
+                                    } else {
+                                        throw e; // Re-throw if max retries reached
+                                    }
+                                }
+                            }
+
+                            if (saved) {
+                                statusMessage.textContent = `✅ ${selectedCourse}-এর জন্য সেশন সম্পন্ন: ${formatTime(durationMs)} সময় পার্মানেন্টলি সেভ করা হলো।`;
+                                statusMessage.classList.remove('text-red-400', 'text-gray-400', 'text-yellow-400');
+                                statusMessage.classList.add('text-green-400');
+                            }
+                            
+                        } catch (e) {
+                            console.error("Error adding document to Firestore (after retries): ", e);
+                            statusMessage.textContent = `⚠️ ডেটা সেভ করা যায়নি। এরর: ${e.message.substring(0, 50)}...`;
+                            statusMessage.classList.remove('text-green-400', 'text-yellow-400');
+                            statusMessage.classList.add('text-red-400');
+                        }
+                    } else {
+                        statusMessage.textContent = `⚠️ Firebase সংযোগ নেই, সময় সেভ হয়নি।`;
+                        statusMessage.classList.remove('text-green-400', 'text-yellow-400');
+                        statusMessage.classList.add('text-red-400');
+                    }
                 } else {
-                     statusMessage.textContent = `সেশনটি খুব ছোট ছিল, সেভ করা হয়নি।`;
-                     statusMessage.classList.remove('text-green-400', 'text-gray-600');
+                     statusMessage.textContent = `সেশনটি খুব ছোট ছিল, কোনো সময় সেভ হয়নি।`;
+                     statusMessage.classList.remove('text-green-400', 'text-gray-400', 'text-yellow-400');
                      statusMessage.classList.add('text-red-400');
                 }
+                // --- END FIREBASE DATA SAVE LOGIC ---
+
 
                 elapsedTime = 0;
                 if(timerHours && timerMinutes && timerSeconds) {
@@ -517,6 +651,8 @@
                 resetButton.disabled = true;
                 courseSelect.disabled = false;
                 startButton.textContent = "▶️ শুরু করুন";
+                
+                // renderReport is now called automatically by the onSnapshot listener
             }
         };
 
@@ -525,7 +661,7 @@
                 clearInterval(timerInterval);
                 isRunning = false;
             }
-            clearMotivation(); // Clear motivation interval
+            clearMotivation(); 
 
             elapsedTime = 0;
             if(timerHours && timerMinutes && timerSeconds) {
@@ -540,182 +676,98 @@
             courseSelect.disabled = false;
             startButton.textContent = "▶️ শুরু করুন";
             statusMessage.textContent = "টাইমার রিসেট করা হয়েছে (এই সেশনের সময় সেভ হয়নি)।";
-            statusMessage.classList.remove('text-green-400');
+            statusMessage.classList.remove('text-green-400', 'text-red-400', 'text-yellow-400');
             statusMessage.classList.add('text-gray-400');
         };
 
-        // --- Confirmation Modal Functions ---
-
-        const showConfirmationModal = (courseId) => {
-            courseIdToReset = courseId;
-            const courseName = courses.find(c => c.id === courseId)?.name || courseId;
-            document.getElementById('modalCourseName').textContent = courseName;
-            confirmationModal.classList.remove('hidden');
-        };
-
-        const hideConfirmationModal = () => {
-            confirmationModal.classList.add('hidden');
-            courseIdToReset = null;
-        };
-        
-        // --- Firestore Functions ---
-
-        const getStudySessionsCollectionRef = () => {
-            // Using /artifacts/{appId}/public/data/ for shared/public data store
-            return collection(db, `artifacts/${appId}/public/data/study_sessions`);
-        };
-
-        const saveSession = async (courseId, durationMs) => {
-            try {
-                const sessionData = {
-                    userId: userId, 
-                    course: courseId,
-                    durationMs: durationMs,
-                    timestamp: serverTimestamp() 
-                };
-                await addDoc(getStudySessionsCollectionRef(), sessionData);
-                console.log("Session saved successfully to Firestore.");
-            } catch (error) {
-                console.error("Error saving session to Firestore:", error);
-            }
-        };
-
-        const resetCourseTotal = async () => {
-            if (!courseIdToReset || !db) {
-                hideConfirmationModal();
-                return;
-            }
-
-            const courseId = courseIdToReset;
-            hideConfirmationModal(); 
-
-            statusMessage.textContent = `Deleting records for ${courseId}...`;
-            statusMessage.classList.remove('text-red-400', 'text-green-400', 'text-gray-400');
-            statusMessage.classList.add('text-yellow-400');
-
-            try {
-                const q = query(getStudySessionsCollectionRef(), where('userId', '==', userId), where('course', '==', courseId));
-                const querySnapshot = await getDocs(q);
-
-                if (querySnapshot.empty) {
-                    statusMessage.textContent = `❌ ${courseId} এর জন্য কোনো ডেটা পাওয়া যায়নি।`;
-                    statusMessage.classList.remove('text-yellow-400');
-                    statusMessage.classList.add('text-red-400');
-                    return;
-                }
-
-                const deletePromises = [];
-                querySnapshot.forEach((doc) => {
-                    deletePromises.push(deleteDoc(doc.ref));
-                });
-
-                await Promise.all(deletePromises);
-
-                statusMessage.textContent = `✅ ${courseId} এর মোট ${querySnapshot.size} টি সেশন রিসেট করা হয়েছে।`;
-                statusMessage.classList.remove('text-yellow-400', 'text-red-400');
-                statusMessage.classList.add('text-green-400');
-            } catch (error) {
-                console.error("Error resetting course total:", error);
-                statusMessage.textContent = `❌ ডেটা রিসেট করার সময় ত্রুটি: ${error.message}`;
-                statusMessage.classList.remove('text-yellow-400');
-                statusMessage.classList.add('text-red-400');
-            }
-            courseIdToReset = null;
-        };
-
-
-        // Real-time listener for report data
-        const setupReportListener = () => {
-            if (!db || !userId) return;
-
-            // Log the path being used for debugging
-            console.log(`Setting up listener for: artifacts/${appId}/public/data/study_sessions for user: ${userId}`);
-
-            const q = query(getStudySessionsCollectionRef(), where('userId', '==', userId));
-
-            onSnapshot(q, (querySnapshot) => {
-                const totals = {};
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    if (data.userId === userId) { 
-                        const courseId = data.course;
-                        const duration = data.durationMs || 0;
-                        totals[courseId] = (totals[courseId] || 0) + duration;
-                    }
-                });
-                renderReport(totals);
-            }, (error) => {
-                console.error("Error setting up Firestore listener:", error);
-            });
-        };
 
         // --- Initialization ---
 
-        const initFirebase = async () => {
-            try {
-                // 1. Initialize Firebase services
-                app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-                setLogLevel('error'); 
-
-                // 2. Handle Authentication
-                await new Promise(resolve => {
-                    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-                        if (!user && initialAuthToken) {
-                             // Use custom token for authentication
-                             await signInWithCustomToken(auth, initialAuthToken);
-                        } else if (!user) {
-                            // Use anonymous sign-in if no token is available
-                            await signInAnonymously(auth);
-                        }
-                        
-                        // Set the userId after successful sign-in
-                        userId = auth.currentUser?.uid || crypto.randomUUID();
-                        userIdDisplay.textContent = userId;
-                        unsubscribe(); 
-                        resolve();
-                    });
-                });
-                
-                // 3. Initialize App Content
-                populateCourseSelector();
-                setupEventListeners();
-                setupReportListener(); 
-                
-                // Set initial view to Timer (This also applies correct tab styling)
-                switchView('timer'); 
-                updateControlButtons();
-                
-                // Start the live clock update
-                updateLiveClock(); 
-                setInterval(updateLiveClock, 1000);
-
-
-            } catch (error) {
-                console.error("Firebase initialization failed:", error);
-                statusMessage.textContent = `Firebase লোড করতে সমস্যা হয়েছে: ${error.message}`;
-                statusMessage.classList.remove('text-green-400', 'text-gray-400');
-                statusMessage.classList.add('text-red-400');
+        async function initFirebaseAndAuth() {
+            if (!firebaseConfig) {
+                console.error("Firebase config is missing.");
+                document.getElementById('userIdDisplay').textContent = 'ত্রুটি: কনফিগ নেই';
+                return;
             }
+
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+            setLogLevel('Debug'); // Enable logging for debugging
+
+            try {
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Authentication failed:", error);
+                document.getElementById('userIdDisplay').textContent = 'অথেন্টিকেশন ব্যর্থ';
+                return;
+            }
+
+            // Auth state listener: Once authenticated, set user ID and start data listener
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    userId = user.uid;
+                    document.getElementById('userIdDisplay').textContent = userId;
+                    setupFirestoreListener(db, userId); 
+                    updateControlButtons(); // Update buttons when DB is ready
+                } else {
+                    userId = 'guest'; 
+                    document.getElementById('userIdDisplay').textContent = userId;
+                    console.warn("User is not authenticated (signed in anonymously but no UID found).");
+                }
+            });
+        }
+
+        const initApp = () => {
+            // 1. Initialize Firebase/Auth (Async)
+            initFirebaseAndAuth();
+
+            // 2. Initialize App Content (Sync)
+            populateCourseSelectors(); // Updated function name
+            setupEventListeners();
+            updateControlButtons();
+            
+            // Start the live clock update
+            updateLiveClock(); 
+            setInterval(updateLiveClock, 1000);
+            
+            // Initial render (will show zero time/loading state)
+            renderReport(); 
         };
 
-        const populateCourseSelector = () => {
-            courseSelect.querySelectorAll('option:not([disabled])').forEach(option => option.remove());
+        // Function to populate BOTH course selectors
+        const populateCourseSelectors = () => {
+            const selectors = [courseSelect, courseResetSelect];
             
-            courses.forEach(course => {
-                const option = document.createElement('option');
-                option.value = course.id;
-                option.textContent = course.name;
-                courseSelect.appendChild(option);
+            selectors.forEach(selector => {
+                // Clear existing options (except the disabled one)
+                selector.querySelectorAll('option:not([disabled])').forEach(option => option.remove());
+                
+                courses.forEach(course => {
+                    const option = document.createElement('option');
+                    option.value = course.id;
+                    option.textContent = course.name;
+                    selector.appendChild(option);
+                });
             });
         };
 
         const updateControlButtons = () => {
             const isCourseSelected = !!courseSelect.value;
-            startButton.disabled = !isCourseSelected || isRunning;
+            // Check if DB and user ID are ready before enabling the start button
+            const isDbReady = userId !== 'loading' && !!db; 
+            
+            startButton.disabled = !isDbReady || !isCourseSelected || isRunning;
             pauseButton.disabled = !isRunning;
             resetButton.disabled = !isRunning;
+
+            // Data Management Button
+            const isResetCourseSelected = !!courseResetSelect.value;
+            deleteDataButton.disabled = !isDbReady || !isResetCourseSelected;
         }
 
         const setupEventListeners = () => {
@@ -723,28 +775,47 @@
             startButton.addEventListener('click', startTimer);
             pauseButton.addEventListener('click', pauseTimer);
             resetButton.addEventListener('click', resetTimer);
+            
+            // Update buttons on course selection change
             courseSelect.addEventListener('change', updateControlButtons);
 
-            // Tab switching listeners (CONFIRMED TO BE CORRECT)
-            timerTab.addEventListener('click', () => switchView('timer'));
-            reportTab.addEventListener('click', () => switchView('report'));
+            // --- Course Reset/Delete Logic ---
+            courseResetSelect.addEventListener('change', updateControlButtons);
 
+            deleteDataButton.addEventListener('click', () => {
+                courseIdToDelete = courseResetSelect.value;
+                if (!courseIdToDelete) return;
 
-            // Event Delegation for dynamic reset buttons in the report
-            reportContainer.addEventListener('click', (e) => {
-                if (e.target.classList.contains('reset-btn')) {
-                    const courseId = e.target.getAttribute('data-course-id');
-                    showConfirmationModal(courseId);
+                const courseObj = courses.find(c => c.id === courseIdToDelete);
+                if (courseObj) {
+                    // Set the course name in the modal text
+                    courseToDeleteName.textContent = courseObj.name;
+                    // Show the modal
+                    deleteConfirmationModal.classList.remove('hidden');
                 }
             });
 
-            // Listeners for the confirmation modal buttons
-            confirmResetButton.addEventListener('click', resetCourseTotal);
-            cancelResetButton.addEventListener('click', hideConfirmationModal);
+            cancelDeleteButton.addEventListener('click', () => {
+                // Hide the modal and clear the state
+                deleteConfirmationModal.classList.add('hidden');
+                courseIdToDelete = null;
+            });
+
+            confirmDeleteButton.addEventListener('click', async () => {
+                // Hide the modal immediately
+                deleteConfirmationModal.classList.add('hidden');
+                
+                if (courseIdToDelete) {
+                    await deleteCourseData(courseIdToDelete);
+                }
+                courseIdToDelete = null;
+            });
+            // --- End Course Reset/Delete Logic ---
+
         };
 
-        // Start the application
-        initFirebase();
+        // Start the application after all functions are defined
+        window.onload = initApp;
     </script>
 </body>
 </html>
@@ -761,4 +832,3 @@
 
 
 
-        
