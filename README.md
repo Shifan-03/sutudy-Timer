@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>কোর্স ফোকাস টাইমার</title>
-    <!-- Tailwind CSS CDN --><script src="https://cdn.tailwindcss.com/3.4.1"></script>
+    <!-- Tailwind CSS CDN --><script src="https://cdn.tailwindcss.com/3.4.1/tailwind.js"></script>
     <!-- Inter Font --><link href="https://fonts.googleapis.com/css2?family=Inter:wght400;600;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -40,7 +40,6 @@
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
         }
         .report-card {
-            /* Deep Background set in JS (bg-gray-900) */
             transition: transform 0.3s ease;
         }
         .report-card:hover {
@@ -87,10 +86,10 @@
         
         <!-- Motivation Message Display -->
         <p id="motivationMessage" class="text-center text-amber-300 font-semibold mb-6 h-6">
-            ডেটা লোড হচ্ছে...
+            পড়ার সেশন শুরু করতে একটি কোর্স নির্বাচন করুন।
         </p>
         
-        <!-- --- TIMER VIEW (The only view, now includes the report) --- -->
+        <!-- --- TIMER VIEW --- -->
         <div id="timerView">
             
             <!-- Course Selector --><div class="mb-8 flex flex-col items-center">
@@ -148,11 +147,14 @@
             <div id="reportSection" class="pt-2 border-t border-gray-700 mt-8">
                 <div class="bg-indigo-900 text-white p-3 rounded-lg mb-4">
                     <p class="text-sm font-semibold">✅ এই অ্যাপটি ফায়ারবেস ব্যবহার করে আপনার অধ্যয়নের সময় পার্মানেন্টলি সেভ করছে।</p>
+                    <p class="text-xs text-yellow-300 mt-1">
+                        ⚠️ **ঐতিহাসিক রিপোর্ট লোডিং টাইম কমাতে শুধুমাত্র সর্বশেষ ১০০টি সেশন দেখানো হচ্ছে।**
+                    </p>
                 </div>
-                <h2 class="text-2xl font-bold text-white mb-6 text-center">মোট অধ্যয়নের রিপোর্ট (লাইফটাইম)</h2>
+                <h2 class="text-2xl font-bold text-white mb-6 text-center">মোট অধ্যয়নের রিপোর্ট (সর্বশেষ ১০০ সেশন)</h2>
                 <div id="reportContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Reports will be inserted here by JavaScript -->
-                    <div class="text-center text-gray-400 col-span-full">ফায়ারবেস থেকে ডেটা লোড হচ্ছে...</div>
+                    <!-- Data will be populated by JS listener -->
+                    <div class="text-center text-gray-400 col-span-full">ডেটা লোড হচ্ছে...</div>
                 </div>
             </div>
             <!-- --- END REPORT SECTION --- -->
@@ -199,7 +201,7 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { 
             getFirestore, collection, addDoc, onSnapshot, setLogLevel, 
-            query, where, getDocs, writeBatch, doc
+            query, where, getDocs, writeBatch, doc, orderBy, limit 
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
         // --- Global Firebase and Application State Variables ---
@@ -221,7 +223,7 @@
         let elapsedTime = 0;
         let isRunning = false;
         
-        // This is now populated by the Firestore listener
+        // studyTotals will now be populated by the limited onSnapshot listener
         let studyTotals = {}; 
         
         // Course data
@@ -325,38 +327,47 @@
 
 
         /**
-         * Firestore Listener: Fetches all documents and updates studyTotals in real-time.
+         * Function to listen for data (Re-enabled with a LIMIT for speed)
          */
         const setupFirestoreListener = (dbInstance, uid) => {
-            if (!uid || uid === 'loading') return;
             const sessionsRef = getCollectionRef(dbInstance, uid);
             
-            onSnapshot(sessionsRef, (snapshot) => {
-                // Reset totals and recalculate from current snapshot
-                studyTotals = {};
-                
-                snapshot.forEach((doc) => {
-                    const session = doc.data();
-                    const courseId = session.courseId;
-                    const durationMs = session.durationMs;
-                    
-                    if (courseId && typeof durationMs === 'number') {
-                         studyTotals[courseId] = (studyTotals[courseId] || 0) + durationMs;
+            // Query to get the 100 most recent sessions, ordered by timestamp for fast loading
+            const q = query(sessionsRef, orderBy('timestamp', 'desc'), limit(100));
+
+            // Listen for real-time updates
+            onSnapshot(q, (snapshot) => {
+                let newStudyTotals = {};
+                let grandTotalMs = 0;
+
+                snapshot.docs.forEach(doc => {
+                    const data = doc.data();
+                    const courseId = data.courseId;
+                    const durationMs = data.durationMs;
+
+                    if (courseId && durationMs > 0) {
+                        if (!newStudyTotals[courseId]) {
+                            newStudyTotals[courseId] = 0;
+                        }
+                        newStudyTotals[courseId] += durationMs;
+                        grandTotalMs += durationMs;
                     }
                 });
-                
-                console.log("Firestore Data Updated. New Totals:", studyTotals);
-                renderReport(); // Re-render the report with updated data
-                motivationMessage.textContent = "পড়ার সেশন শুরু করতে একটি কোর্স নির্বাচন করুন।";
+
+                studyTotals = newStudyTotals;
+                renderReport(grandTotalMs);
             }, (error) => {
                 console.error("Error setting up Firestore listener:", error);
-                statusMessage.textContent = "⚠️ ডেটা লোড করতে বা সিঙ্ক করতে সমস্যা হচ্ছে।";
+                statusMessage.textContent = "⚠️ ডেটা লোড করতে ব্যর্থ (সংযোগ ত্রুটি)।";
+                statusMessage.classList.remove('text-green-400', 'text-gray-400');
                 statusMessage.classList.add('text-red-400');
             });
         };
 
+
         /**
          * Core function to delete all sessions for a specific course using a batch write.
+         * Note: This deletes ALL sessions, not just the 100 that are displayed.
          * @param {string} courseId The ID of the course whose data should be deleted.
          */
         const deleteCourseData = async (courseId) => {
@@ -401,95 +412,51 @@
         };
 
 
-        // --- Report Rendering Function (Updated for Dynamic Colors) ---
-        const renderReport = () => {
+        // --- Report Rendering Function (Displays data based on the limited studyTotals) ---
+        const renderReport = (grandTotalMs = 0) => {
             reportContainer.innerHTML = '';
             
-            // Step 1: Calculate total study time
-            const totalStudyTime = Object.values(studyTotals).reduce((acc, time) => acc + time, 0);
+            const totalTimeFormatted = formatTime(grandTotalMs);
 
-            // Step 2: Show Total Time Card (Deep Indigo/Blue with dramatic shadow)
-            const totalCard = document.createElement('div');
-            // Keeping the total card highlight consistently blue/indigo for focus
-            totalCard.className = "report-card p-5 rounded-xl shadow-[0_0_20px_rgba(59,130,246,0.3)] bg-indigo-800 col-span-full mb-6";
-            totalCard.innerHTML = `
-                <p class="text-sm font-medium text-indigo-300">মোট অধ্যয়নের সময়</p>
-                <p class="text-4xl font-extrabold text-white mt-1">${formatTime(totalStudyTime)}</p>
+            // Grand Total Card (Now dynamic)
+            const grandTotalCard = `
+                <div class="report-card p-5 rounded-xl shadow-[0_0_20px_rgba(59,130,246,0.3)] bg-indigo-800 col-span-full mb-6">
+                    <p class="text-sm font-medium text-indigo-300">মোট অধ্যয়নের সময় (সর্বশেষ ${Object.keys(studyTotals).length}টি কোর্সে)</p>
+                    <p class="text-4xl font-extrabold text-white mt-1">${totalTimeFormatted}</p>
+                </div>
             `;
-            reportContainer.appendChild(totalCard);
+            reportContainer.innerHTML += grandTotalCard;
 
-            // Step 3: Render Individual course cards with dynamic colors
-            courses.forEach((course, index) => {
-                const courseId = course.id;
-                const courseName = course.name;
-                const totalMs = studyTotals[courseId] || 0; 
-                
-                const formattedTime = formatTime(totalMs);
-                
-                let percentage = 0;
-                if (totalStudyTime > 0) {
-                    percentage = (totalMs / totalStudyTime) * 100;
-                }
-                
-                const isZeroTime = totalMs === 0;
+            // Individual Course Reports
+            const courseIds = Object.keys(studyTotals).sort((a, b) => studyTotals[b] - studyTotals[a]);
 
-                const card = document.createElement('div');
-                
-                // --- Dynamic Color Application ---
-                const colorBase = courseColors[index % courseColors.length]; // Cycle through colors
-                // Need to use utility classes directly, so we map the color name to the class string
-                // Note: Tailwind classes must be fully present in the source code to be generated
-                const colorMap = {
-                    'blue': 'blue',
-                    'emerald': 'emerald',
-                    'rose': 'rose',
-                    'cyan': 'cyan',
-                    'violet': 'violet',
-                    'orange': 'orange',
-                    'teal': 'teal',
-                    'red': 'red'
-                };
-                const baseColor = colorMap[colorBase];
-                // Tailwind class names are constructed this way:
-                const borderClass = `border-${baseColor}-400`;
-                const progressBgClass = `bg-${baseColor}-400`;
-                const textHighlightClass = `text-${baseColor}-300`;
-
-                // Dummy usage to ensure Tailwind includes classes (important for dynamically generated names)
-                const _tailwindFix = [
-                    'border-blue-400', 'bg-blue-400', 'text-blue-300',
-                    'border-emerald-400', 'bg-emerald-400', 'text-emerald-300',
-                    'border-rose-400', 'bg-rose-400', 'text-rose-300',
-                    'border-cyan-400', 'bg-cyan-400', 'text-cyan-300',
-                    'border-violet-400', 'bg-violet-400', 'text-violet-300',
-                    'border-orange-400', 'bg-orange-400', 'text-orange-300',
-                    'border-teal-400', 'bg-teal-400', 'text-teal-300',
-                    'border-red-400', 'bg-red-400', 'text-red-300',
-                ].join(' '); 
-                
-                let cardClasses;
-                
-                if (isZeroTime) {
-                    // Inactive Card: Deep background, muted border, slightly transparent
-                    cardClasses = "report-card p-4 rounded-xl shadow-lg border-l-4 border-gray-700 bg-gray-900 opacity-70"; 
-                } else {
-                    // Active Card: Deep background, dynamic color highlight, stronger shadow
-                    cardClasses = `report-card p-4 rounded-xl shadow-xl border-l-4 ${borderClass} bg-gray-900`; 
-                }
-
-                card.className = cardClasses; 
-                card.innerHTML = `
-                    <p class="text-base font-semibold ${isZeroTime ? 'text-gray-500' : 'text-white'}">${courseName}</p>
-                    <p class="text-xl font-extrabold ${isZeroTime ? 'text-gray-600' : textHighlightClass} mt-1">
-                        ${formattedTime}
-                    </p>
-                    <div class="mt-3 h-2 bg-gray-700 rounded-full">
-                        <div class="h-full ${progressBgClass} rounded-full transition-all duration-500" style="width: ${percentage.toFixed(1)}%;"></div> 
+            if (courseIds.length === 0 && grandTotalMs === 0) {
+                reportContainer.innerHTML += `
+                    <div class="text-center text-gray-400 col-span-full mt-4">
+                        কোনো অধ্যয়নের ডেটা নেই। (সর্বশেষ ১০০ সেশনের মধ্যে)
                     </div>
-                    <p class="text-xs ${isZeroTime ? 'text-gray-600' : 'text-gray-400'} mt-2">${percentage.toFixed(1)}% মোট সময়ের</p>
                 `;
+                return;
+            }
+            
+            // Loop through courses and render cards
+            courseIds.forEach(courseId => {
+                const durationMs = studyTotals[courseId];
+                const formattedDuration = formatTime(durationMs);
+                const courseObj = courses.find(c => c.id === courseId);
+                const courseName = courseObj ? courseObj.name : courseId;
                 
-                reportContainer.appendChild(card);
+                // Find the color index
+                const courseIndex = courses.findIndex(c => c.id === courseId);
+                const colorIndex = courseIndex !== -1 ? courseIndex % courseColors.length : 0;
+                const color = courseColors[colorIndex];
+                
+                reportContainer.innerHTML += `
+                    <div class="report-card p-4 rounded-xl shadow-lg bg-${color}-700 border border-${color}-600">
+                        <p class="text-sm font-medium text-${color}-200">${courseName}</p>
+                        <p class="text-2xl font-bold text-white mt-1">${formattedDuration}</p>
+                    </div>
+                `;
             });
         };
 
@@ -506,7 +473,8 @@
                 clearInterval(motivationInterval);
                 motivationInterval = null;
             }
-            // Message remains permanent prompt
+            // Reset to the default prompt message
+            motivationMessage.textContent = "পড়ার সেশন শুরু করতে একটি কোর্স নির্বাচন করুন।"; 
         };
 
 
@@ -546,6 +514,7 @@
                 statusMessage.classList.add('text-red-400');
                 return;
             }
+            // Check only if the authentication process has completed
             if (userId === 'loading') {
                 statusMessage.textContent = "ডেটাবেস সংযোগের জন্য অপেক্ষা করুন...";
                 statusMessage.classList.remove('text-red-400', 'text-green-400');
@@ -588,7 +557,7 @@
                     if (db && userId && userId !== 'loading') {
                         const sessionsRef = getCollectionRef(db, userId);
                         try {
-                            // Exponential Backoff implementation (simple version for single attempt)
+                            // Exponential Backoff implementation
                             const MAX_RETRIES = 3;
                             let retries = 0;
                             let saved = false;
@@ -652,7 +621,7 @@
                 courseSelect.disabled = false;
                 startButton.textContent = "▶️ শুরু করুন";
                 
-                // renderReport is now called automatically by the onSnapshot listener
+                // onSnapshot listener handles report update automatically now.
             }
         };
 
@@ -707,11 +676,12 @@
                 return;
             }
 
-            // Auth state listener: Once authenticated, set user ID and start data listener
+            // Auth state listener: Once authenticated, set user ID and update buttons
             onAuthStateChanged(auth, (user) => {
                 if (user) {
                     userId = user.uid;
                     document.getElementById('userIdDisplay').textContent = userId;
+                    // Re-enabling the listener with a LIMIT for fast loading.
                     setupFirestoreListener(db, userId); 
                     updateControlButtons(); // Update buttons when DB is ready
                 } else {
@@ -727,7 +697,7 @@
             initFirebaseAndAuth();
 
             // 2. Initialize App Content (Sync)
-            populateCourseSelectors(); // Updated function name
+            populateCourseSelectors(); 
             setupEventListeners();
             updateControlButtons();
             
@@ -735,8 +705,8 @@
             updateLiveClock(); 
             setInterval(updateLiveClock, 1000);
             
-            // Initial render (will show zero time/loading state)
-            renderReport(); 
+            // Initial render placeholder
+            renderReport(0); 
         };
 
         // Function to populate BOTH course selectors
@@ -758,7 +728,7 @@
 
         const updateControlButtons = () => {
             const isCourseSelected = !!courseSelect.value;
-            // Check if DB and user ID are ready before enabling the start button
+            // Check if DB and user ID are ready (auth completed) before enabling the start button
             const isDbReady = userId !== 'loading' && !!db; 
             
             startButton.disabled = !isDbReady || !isCourseSelected || isRunning;
@@ -809,6 +779,7 @@
                     await deleteCourseData(courseIdToDelete);
                 }
                 courseIdToDelete = null;
+                // onSnapshot listener will update the report after deletion
             });
             // --- End Course Reset/Delete Logic ---
 
@@ -819,6 +790,12 @@
     </script>
 </body>
 </html>
+
+
+
+
+
+
 
 
 
